@@ -1,0 +1,4 @@
+body { font-family: Inter, system-ui, Arial, sans-serif; margin:0; background:#fafafa; color:#111; }
+button { cursor:pointer; }
+input { padding:6px 8px; }
+.container { max-width:1100px; margin: 0 auto; padding: 20px; }
