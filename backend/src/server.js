@@ -17,35 +17,35 @@ const logger = winston.createLogger({
 });
 
 const app = express();
-
-// Segurança e compressão
 app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(morgan('combined'));
 
-// CORS - permitir credenciais apenas da origem do frontend
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
+// Permitir múltiplas origens de frontend em dev
+const FRONTEND_ORIGINS = [
+  process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+  'http://127.0.0.1:5173'
+];
 
-// Preflight handler and CORS options
+// CORS options: aceita as origens listadas e permite credenciais
 const corsOptions = {
   origin: function(origin, callback) {
-    // origin === undefined for same-origin requests, curl, etc.
-    if (!origin || origin === FRONTEND_ORIGIN) {
-      callback(null, true);
-    } else {
-      callback(new Error('Origin not allowed by CORS: ' + origin));
-    }
+    // permitir requests sem origin (curl, server-side)
+    if (!origin) return callback(null, true);
+    if (FRONTEND_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error('Origin not allowed by CORS: ' + origin));
   },
   credentials: true,
   methods: ['GET','POST','OPTIONS','PUT','DELETE'],
   allowedHeaders: ['Content-Type','Authorization','X-Requested-With','Accept']
 };
 
-// Quick preflight response for OPTIONS
+// Preflight handler: responde com o origin enviado pelo browser
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Origin', FRONTEND_ORIGIN);
+    const origin = req.headers.origin || FRONTEND_ORIGINS[0];
+    res.header('Access-Control-Allow-Origin', origin);
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
@@ -84,4 +84,4 @@ app.use('/api/anime', animeRoutes);
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => logger.info(`Backend rodando na porta ${port} (FRONTEND_ORIGIN=${FRONTEND_ORIGIN})`));
+app.listen(port, () => logger.info(`Backend rodando na porta ${port} (FRONTEND_ORIGINS=${FRONTEND_ORIGINS.join(',')})`));
