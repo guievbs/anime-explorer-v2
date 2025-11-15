@@ -1,1 +1,1 @@
-# anime-explorer-v2
+Falta arruma o erro do cors
