@@ -1,23 +1,32 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import Grid from '@mui/material/Grid';
 import AnimeCard from './AnimeCard';
-import { AppContext } from '../contexts/AppProvider';
 
-export default function AnimeList({ results: propResults }) {
-  const { state } = useContext(AppContext);
-  const items = propResults ?? state.results ?? [];
+export default function AnimeList({ results }) {
+  const items = Array.isArray(results) ? results : [];
 
-  if (!items || items.length === 0) {
+  if (!items.length) {
     return <div style={{ textAlign:'center', marginTop:20 }}>Nenhum anime encontrado</div>;
   }
 
   return (
     <Grid container spacing={3}>
-      {items.map((a, i) => (
-        <Grid item xs={12} sm={6} md={4} key={(a.mal_id ?? a.id ?? i)}>
-          <AnimeCard anime={a} />
-        </Grid>
-      ))}
+      {items.map((a, i) => {
+        // fallback para formato inesperado: se a não for objeto, mostramos json
+        if (!a || typeof a !== 'object') {
+          return (
+            <Grid item xs={12} key={`bad-${i}`}>
+              <pre style={{ whiteSpace:'pre-wrap', wordBreak:'break-word' }}>{JSON.stringify(a, null, 2)}</pre>
+            </Grid>
+          );
+        }
+        const key = a.mal_id ?? a.id ?? `idx-${i}`;
+        return (
+          <Grid item xs={12} sm={6} md={4} key={key}>
+            <AnimeCard anime={a} />
+          </Grid>
+        );
+      })}
     </Grid>
   );
 }

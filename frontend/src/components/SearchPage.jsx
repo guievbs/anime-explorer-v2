@@ -12,7 +12,11 @@ export default function SearchPage() {
     <Box>
       <SearchBar />
       {state.error && <Typography color="error" sx={{ mb:2 }}>{state.error}</Typography>}
-      {state.results.length ? <AnimeList /> : <Typography sx={{ mt:4 }} align="center">Faça uma busca para ver resultados</Typography>}
+      {Array.isArray(state.results) && state.results.length ? (
+        <AnimeList results={state.results} />
+      ) : (
+        <Typography sx={{ mt:4, textAlign:'center' }}>Faça uma busca para ver resultados</Typography>
+      )}
     </Box>
   );
 }

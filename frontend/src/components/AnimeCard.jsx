@@ -20,11 +20,7 @@ export default function AnimeCard({ anime }) {
     dispatch({ type:'TOGGLE_FAVORITE', payload: anime });
   };
 
-  const image = anime?.images?.jpg?.large_image_url
-    || anime?.images?.jpg?.image_url
-    || anime?.image_url
-    || 'https://via.placeholder.com/300x450?text=Sem+imagem';
-
+  const image = anime?.image_url || anime?.images?.jpg?.large_image_url || anime?.images?.jpg?.image_url || 'https://via.placeholder.com/300x450?text=Sem+imagem';
   const title = anime?.title_english || anime?.title || anime?.name || 'Título desconhecido';
   const score = (anime && (anime.score !== undefined && anime.score !== null)) ? anime.score : 'N/A';
   const type = anime?.type || 'N/A';
@@ -32,7 +28,7 @@ export default function AnimeCard({ anime }) {
 
   return (
     <>
-      <Card onClick={() => setOpen(true)} sx={{ width: '100%', maxWidth: 360, height: 480, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+      <Card onClick={() => setOpen(true)} sx={{ width: '100%', maxWidth: 360, height: 480, display:'flex', flexDirection:'column', justifyContent:'space-between', ':hover': { boxShadow: 6 } }}>
         <CardMedia component="img" image={image} alt={title} sx={{ height: 260, objectFit: 'cover' }} />
         <CardContent sx={{ flexGrow:1 }}>
           <Typography variant="h6" component="div" sx={{ display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>{title}</Typography>

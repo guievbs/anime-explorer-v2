@@ -74,7 +74,7 @@ export default function AuthPage() {
               </Button>
             </Grid>
             <Grid item>
-              <Typography variant="caption">Usuário seed: <strong>student1</strong> / senha: <strong>senha123</strong></Typography>
+              <Typography variant="caption">Usuário: <strong>admin</strong> / senha: <strong>senha123</strong></Typography>
             </Grid>
           </Grid>
         </div>

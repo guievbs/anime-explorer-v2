@@ -1,8 +1,21 @@
+// leitura defensiva de localStorage para não quebrar em ambientes de teste
+function safeGetFavorites() {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const raw = localStorage.getItem('favorites');
+      return raw ? JSON.parse(raw) : [];
+    }
+  } catch (e) {
+    // ignorar erros de parsing ou acesso
+  }
+  return [];
+}
+
 export const initialState = {
   auth: null,
   query: '',
   results: [],
-  favorites: JSON.parse(localStorage.getItem('favorites')||'[]'),
+  favorites: safeGetFavorites(),
   error: null
 };
 
@@ -17,16 +30,16 @@ export function reducer(state, action) {
       const exists = state.favorites.find(a => (a.mal_id ?? a.id) === (action.payload.mal_id ?? action.payload.id));
       const updated = exists ? state.favorites.filter(a => (a.mal_id ?? a.id) !== (action.payload.mal_id ?? action.payload.id))
                              : [...state.favorites, action.payload];
-      localStorage.setItem('favorites', JSON.stringify(updated));
+      try { if (typeof window !== 'undefined' && window.localStorage) localStorage.setItem('favorites', JSON.stringify(updated)); } catch(e) {}
       return { ...state, favorites: updated };
     }
     case 'REMOVE_FAVORITE': {
       const updated = state.favorites.filter(a => (a.mal_id ?? a.id) !== action.payload);
-      localStorage.setItem('favorites', JSON.stringify(updated));
+      try { if (typeof window !== 'undefined' && window.localStorage) localStorage.setItem('favorites', JSON.stringify(updated)); } catch(e) {}
       return { ...state, favorites: updated };
     }
     case 'CLEAR_FAVORITES': {
-      localStorage.removeItem('favorites');
+      try { if (typeof window !== 'undefined' && window.localStorage) localStorage.removeItem('favorites'); } catch(e) {}
       return { ...state, favorites: [] };
     }
     default:
