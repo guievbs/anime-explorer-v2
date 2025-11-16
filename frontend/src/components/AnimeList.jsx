@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Grid from '@mui/material/Grid';
 import AnimeCard from './AnimeCard';
+import { AppContext } from '../contexts/AppProvider';
 
-export default function AnimeList({ results }) {
-  // read results either from prop or from global state
-  // but our SearchPage passes state.results via context; to keep API simple, try to obtain from context if not passed
-  const items = results || [];
+export default function AnimeList({ results: propResults }) {
+  const { state } = useContext(AppContext);
+  const items = propResults ?? state.results ?? [];
+
+  if (!items || items.length === 0) {
+    return <div style={{ textAlign:'center', marginTop:20 }}>Nenhum anime encontrado</div>;
+  }
+
   return (
     <Grid container spacing={3}>
       {items.map((a, i) => (
