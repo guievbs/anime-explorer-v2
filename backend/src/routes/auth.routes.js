@@ -2,6 +2,25 @@ const express = require('express');
 const router = express.Router();
 const UserModel = require('../models/UserModel');
 
+// POST /api/auth/register
+// cria usuário (username único). Retorna 201 com user (sem password_hash)
+router.post('/register', async (req, res) => {
+  const { username, password, name } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'username e password são obrigatórios' });
+  try {
+    const existing = await UserModel.findByUsername(username);
+    if (existing) return res.status(409).json({ error: 'Usuário já existe' });
+    const created = await UserModel.create(username, password, name || null);
+    // não enviar password_hash
+    delete created.password_hash;
+    res.status(201).json({ user: { id: created.id, username: created.username, name: created.name } });
+  } catch (err) {
+    console.error('register error', err);
+    res.status(500).json({ error: 'Erro ao criar usuário' });
+  }
+});
+
+// login
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Usuário e senha obrigatórios' });

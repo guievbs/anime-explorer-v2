@@ -22,16 +22,14 @@ app.use(compression());
 app.use(express.json());
 app.use(morgan('combined'));
 
-// Permitir múltiplas origens de frontend em dev
+// CORS simples em dev: aceitamos localhost/127.0.0.1
 const FRONTEND_ORIGINS = [
   process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
   'http://127.0.0.1:5173'
 ];
 
-// CORS options: aceita as origens listadas e permite credenciais
 const corsOptions = {
   origin: function(origin, callback) {
-    // permitir requests sem origin (curl, server-side)
     if (!origin) return callback(null, true);
     if (FRONTEND_ORIGINS.includes(origin)) return callback(null, true);
     callback(new Error('Origin not allowed by CORS: ' + origin));
@@ -41,7 +39,6 @@ const corsOptions = {
   allowedHeaders: ['Content-Type','Authorization','X-Requested-With','Accept']
 };
 
-// Preflight handler: responde com o origin enviado pelo browser
 app.use((req, res, next) => {
   if (req.method === 'OPTIONS') {
     const origin = req.headers.origin || FRONTEND_ORIGINS[0];
@@ -56,32 +53,28 @@ app.use((req, res, next) => {
 
 app.use(cors(corsOptions));
 
-// Sessão (dev): sameSite 'lax' e secure false em HTTP local
 app.use(session({
   secret: process.env.SESSION_SECRET || 'troque_essa_sessao',
   resave: false,
   saveUninitialized: false,
-  cookie: {
-    secure: false,      // true somente em produção com HTTPS
-    httpOnly: true,
-    sameSite: 'lax'     // 'none' requer secure:true + HTTPS
-  }
+  cookie: { secure: false, httpOnly: true, sameSite: 'lax' }
 }));
 
-// Rate limiter básico para auth
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 min
+  windowMs: 15 * 60 * 1000,
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Rotas
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/anime', animeRoutes);
-
-// Healthcheck
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-const port = process.env.PORT || 4000;
-app.listen(port, () => logger.info(`Backend rodando na porta ${port} (FRONTEND_ORIGINS=${FRONTEND_ORIGINS.join(',')})`));
+// somente faz listen se NÃO for requerido por outro módulo (ex: testes)
+if (require.main === module) {
+  const port = process.env.PORT || 4000;
+  app.listen(port, () => logger.info(`Backend rodando na porta ${port}`));
+}
+
+module.exports = { app };
