@@ -18,6 +18,10 @@ class AnimeModel {
   static async findById(id) {
     return db('animes').where({ id }).first();
   }
+
+  static async deleteById(id) {
+    return db('animes').where({ id }).del();
+  }
 }
 
 module.exports = AnimeModel;

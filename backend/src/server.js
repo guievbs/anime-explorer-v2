@@ -22,7 +22,7 @@ app.use(compression());
 app.use(express.json());
 app.use(morgan('combined'));
 
-// CORS simples em dev: aceitamos localhost/127.0.0.1
+// CORS simples em dev
 const FRONTEND_ORIGINS = [
   process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
   'http://127.0.0.1:5173'
