@@ -1,4 +1,3 @@
-// backend/test/auth.test.js
 const request = require('supertest');
 const { expect } = require('chai');
 const { app } = require('../src/server');
@@ -7,10 +6,10 @@ const db = require('../src/config/db');
 describe('Auth API', function() {
   before(async function() {
     // cria DB e tabelas se necessário
-    // Assumimos que setup_db.js foi rodado; para garantir, criamos user cleanup
+    // Assumimos que setup_db.js foi rodado antes dos testes
   });
 
-  it('should register a new user then login', async function() {
+  it('Deve criar um novo usuário e logar', async function() {
     const username = `testuser_${Date.now()}`;
     const password = 'testpass';
     // register
@@ -27,7 +26,7 @@ describe('Auth API', function() {
   });
 
   after(async function() {
-    // optional cleanup
+    // cleanup
     await db.destroy();
   });
 });
