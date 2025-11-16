@@ -1,21 +1,27 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../contexts/AppProvider';
 import Header from './Header';
-import SearchBar from './SearchBar';
-import AnimeList from './AnimeList';
+import AuthPage from './AuthPage';
+import SearchPage from './SearchPage';
+import FavoritesPage from './FavoritesPage';
 import Footer from './Footer';
+import Container from '@mui/material/Container';
 
 export default function App() {
   const { state } = useContext(AppContext);
+
+  if (!state.auth) {
+    // show auth screen (login/signup)
+    return <AuthPage />;
+  }
+
   return (
-    <div>
+    <>
       <Header />
-      <main className="container">
-        <SearchBar />
-        {state.error && <div style={{color:'red'}}>{state.error}</div>}
-        {state.results.length ? <AnimeList /> : <div style={{textAlign:'center',marginTop:40}}>Bem-vindo ao Anime Explorer</div>}
-      </main>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 6 }}>
+        <SearchPage />
+      </Container>
       <Footer />
-    </div>
+    </>
   );
 }

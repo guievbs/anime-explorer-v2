@@ -1,32 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 export default function AnimeModal({ open, onClose, anime }) {
+  const [details, setDetails] = useState(anime || null);
+  useEffect(() => { setDetails(anime || null); }, [anime]);
+
   if (!open) return null;
-  const img = anime?.images?.jpg?.large_image_url || anime?.image_url || anime?.images?.jpg?.image_url || '';
-  const title = anime?.title_english || anime?.title || 'Sem título';
+  const img = details?.images?.jpg?.large_image_url || details?.image_url || details?.images?.jpg?.image_url || '';
+  const title = details?.title_english || details?.title || details?.name || 'Título desconhecido';
 
   return (
-    <div onClick={onClose} style={{position:'fixed',left:0,top:0,right:0,bottom:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div onClick={e=>e.stopPropagation()} style={{background:'#fff',padding:20,maxWidth:800,width:'90%',borderRadius:8}}>
-        <div style={{display:'flex',gap:16}}>
-          {img && <img src={img} alt={title} style={{width:200,height:300,objectFit:'cover'}} />}
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent dividers>
+        <div style={{ display:'flex', gap:16 }}>
+          {img && <img src={img} alt={title} style={{ width:200, height:300, objectFit:'cover', borderRadius:8 }} />}
           <div>
-            <h2>{title}</h2>
-            <p><strong>Nota:</strong> {anime.score ?? 'N/A'}</p>
-            <p><strong>Tipo:</strong> {anime.type ?? 'N/A'}</p>
-            <p><strong>Temporada:</strong> {anime.season ? `${anime.season} ${anime.year ?? ''}` : 'N/A'}</p>
-            <p><strong>Classificação:</strong> {anime.rating ?? 'N/A'}</p>
+            <Typography variant="body2"><strong>Nota:</strong> {details?.score ?? 'N/A'}</Typography>
+            <Typography variant="body2"><strong>Tipo:</strong> {details?.type ?? 'N/A'}</Typography>
+            <Typography variant="body2"><strong>Temporada:</strong> {details?.season ? `${details.season} ${details.year ?? ''}` : 'N/A'}</Typography>
+            <Typography variant="body2" sx={{ mt:2 }}>{details?.synopsis || details?.description || 'Sinopse não disponível.'}</Typography>
           </div>
         </div>
-
-        <div style={{marginTop:12}}>
-          <p>{anime.synopsis || anime.description || 'Sinopse não disponível.'}</p>
-        </div>
-
-        <div style={{display:'flex',justifyContent:'flex-end',gap:8,marginTop:12}}>
-          <button onClick={onClose}>Fechar</button>
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Fechar</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

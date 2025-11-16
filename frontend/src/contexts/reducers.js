@@ -2,9 +2,8 @@ export const initialState = {
   auth: null,
   query: '',
   results: [],
-  favorites: JSON.parse(localStorage.getItem('favorites')) || [],
-  error: null,
-  darkMode: JSON.parse(localStorage.getItem('darkMode')) ?? false
+  favorites: JSON.parse(localStorage.getItem('favorites')||'[]'),
+  error: null
 };
 
 export function reducer(state, action) {
@@ -16,9 +15,8 @@ export function reducer(state, action) {
     case 'SET_ERROR': return { ...state, error: action.payload };
     case 'TOGGLE_FAVORITE': {
       const exists = state.favorites.find(a => (a.mal_id ?? a.id) === (action.payload.mal_id ?? action.payload.id));
-      let updated;
-      if (exists) updated = state.favorites.filter(a => (a.mal_id ?? a.id) !== (action.payload.mal_id ?? action.payload.id));
-      else updated = [...state.favorites, action.payload];
+      const updated = exists ? state.favorites.filter(a => (a.mal_id ?? a.id) !== (action.payload.mal_id ?? action.payload.id))
+                             : [...state.favorites, action.payload];
       localStorage.setItem('favorites', JSON.stringify(updated));
       return { ...state, favorites: updated };
     }
@@ -27,16 +25,10 @@ export function reducer(state, action) {
       localStorage.setItem('favorites', JSON.stringify(updated));
       return { ...state, favorites: updated };
     }
-    case 'CLEAR_FAVORITES':
+    case 'CLEAR_FAVORITES': {
       localStorage.removeItem('favorites');
       return { ...state, favorites: [] };
-    case 'TOGGLE_THEME': {
-      const newMode = !state.darkMode;
-      localStorage.setItem('darkMode', JSON.stringify(newMode));
-      return { ...state, darkMode: newMode };
     }
-    case 'RESET_SEARCH':
-      return { ...state, query: '', results: [], error: null };
     default:
       return state;
   }

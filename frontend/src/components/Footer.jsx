@@ -1,8 +1,11 @@
 import React from 'react';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+
 export default function Footer() {
   return (
-    <footer style={{textAlign:'center',padding:20,borderTop:'1px solid #eee',marginTop:40}}>
-      © {new Date().getFullYear()} Anime Explorer — V2
-    </footer>
+    <Box sx={{ py:4, mt:6, borderTop: '1px solid #eee', textAlign:'center' }}>
+      <Typography variant="body2">© {new Date().getFullYear()} Anime Explorer</Typography>
+    </Box>
   );
 }
